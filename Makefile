@@ -1,8 +1,12 @@
 target = test
 srcdir = src
-CC = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-gcc
-LD = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-ld
-OBJCOPY = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-objcopy
+#CC = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-gcc
+#LD = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-ld
+#OBJCOPY = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-objcopy
+CC = arm-linux-gcc
+LD = arm-linux-ld
+OBJCOPY = arm-linux-objcopy
+
 src = $(wildcard $(srcdir)/*.s)
 obj = $(patsubst %.s, %.o, $(src))
 $(target).imx:$(obj)

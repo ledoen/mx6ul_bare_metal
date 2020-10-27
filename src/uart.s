@@ -65,14 +65,19 @@ uart_init:
     mov pc, lr
     
 putc:
-    ldr r0, =0x2020098
-    ldr r1, [r0]
-    lsr r1, #3
-    and r1, #0x1
-    cmp r1, #0x1
-    bne putc
-    ldr r0, =0x2020040
-    str r7, [r0]
+	lsr r4, r7, #28
+isbusy:	
+    ldr r5, =0x2020098
+    ldr r6, [r5]
+    lsr r6, #3
+    and r6, #0x1
+    cmp r6, #0x1
+    bne isbusy
+	cmp r4, #0x9
+	addls r4, #0x30
+	addhi r4, #0x57
+	ldr r5, =0x2020040
+    str r4, [r5]
     mov pc, lr
     
 @getc:
@@ -84,10 +89,10 @@ uart_pri_r0:
     ldr r1, =0x8 		@setup repeat count 8 in r1
 	ldr r2, [r0]
 putbyte:	
-	and r7, r2, #0xff	@get lower byte of r2
+	and r7, r2, #0xf0000000	@get lower 4bit of r2
 	bl putc				@put one byte
-	lsr r2, #8			@right shift r2 8 bits 
-	cmp r1, #0x0		@compare repeat count with 0x0
+	lsl r2, #4			@right shift r2 4 bits 
+	cmp r1, #0x1		@compare repeat count with 0x0
 	subne r1, #1		@repeat count -1
 	bne putbyte
     mov pc,lr
