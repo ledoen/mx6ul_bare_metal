@@ -1,6 +1,13 @@
 .global uart_init
 @init the uart register
 uart_init:
+
+	@disable uart
+    ldr r0, =0x2020080
+    ldr r1, =0x0
+    str r1, [r0]
+		
+	
     @set pad gpio1_16-17 ALT0
     ldr r0, =0x20e0084
     ldr r1, [r0]
@@ -24,11 +31,11 @@ uart_init:
     ldr r1, =0x4027
     str r1, [r0]
     
-    @set ucr3
+    @set ucr3 0x4
     ldr r0, =0x2020088
     ldr r1, =0x4
     str r1, [r0]
-    
+	
     @set ufcr for dte/dce
     ldr r0, =0x2020090
     ldr r1, =0x80
@@ -56,7 +63,9 @@ uart_init:
     ldr r2, =0x03000000
     orr r1, r2
     str r1, [r0]
-    
+	
+
+	
     @enable uart
     ldr r0, =0x2020080
     ldr r1, =0x1
@@ -80,8 +89,6 @@ isbusy:
     str r4, [r5]
     mov pc, lr
     
-@getc:
-@    mov pc, lr
 
 .global uart_pri_r0
 
@@ -95,5 +102,18 @@ putbyte:
 	cmp r1, #0x1		@compare repeat count with 0x0
 	subne r1, #1		@repeat count -1
 	bne putbyte
-    mov pc,lr
+    mov pc, lr
+
+	@reset uart
+	ldr r0, =0x2020084
+	ldr r2, =0x1
+	ldr r1, [r0]
+	bic r1, r2
+	str r1, [r0]
+isreset:
+	ldr r0, =0x20200b4
+	ldr r1, [r0]
+	and r1, r2
+	cmp r1, #0x1
+	beq isreset
 	

@@ -26,7 +26,7 @@ ispll1locked:
     
     @switch cpu clk to pll1
     ldr r0, =0x20c400c
-    ldr r1, =0x0
+    ldr r1, =0x100
     str r1, [r0]
     
     @set cpu root clk divider
@@ -34,10 +34,12 @@ ispll1locked:
     ldr =0x1
     str r1, [r0]
     
+@	mov pc, lr
+	
     @uart clk init ,i.e pll3 init
     @set pll3
     ldr r0, =0x20c8010
-    ldr r1, =0x2040
+    ldr r1, =0x3000
     str r1, [r0]
     
     @enable pll3 wait pll3 locked
