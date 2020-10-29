@@ -6,7 +6,7 @@ uart_init:
     ldr r0, =0x2020080
     ldr r1, =0x0
     str r1, [r0]
-		
+	
 	
     @set pad gpio1_16-17 ALT0
     ldr r0, =0x20e0084
@@ -96,8 +96,13 @@ uart_pri_r0:
     ldr r1, =0x8 		@setup repeat count 8 in r1
 	ldr r2, [r0]
 putbyte:	
-	and r7, r2, #0xf0000000	@get lower 4bit of r2
-	bl putc				@put one byte
+	and r7, r2, #0xf0000000		@get lower 4bit of r2
+@	bl putc				@put one byte
+	lsr r7, #28			@r7 right shift 28bit
+	@mov r7 to uart data register
+	ldr r5, =0x2020040
+    str r7, [r5]
+	
 	lsl r2, #4			@right shift r2 4 bits 
 	cmp r1, #0x1		@compare repeat count with 0x0
 	subne r1, #1		@repeat count -1

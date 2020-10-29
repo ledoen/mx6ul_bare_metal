@@ -1,6 +1,6 @@
-.global _start
+.global led_init
 
-_start:
+led_init:
 	
 	@enable GPIO clk
 	ldr r0, =0x20c406c	@将CCM_CCGR1寄存器的地址放入r0
@@ -41,6 +41,33 @@ _start:
 	bic r1, r1, r2
 	str r1, [r0]
 	
-1:
-	b 1b
+
+    mov pc, lr
+    
+.global led_up
+
+led_up:
+    @light led
+	ldr r0, =0x0209c000
+	ldr r1, [r0]
+	ldr r2, =0x1
+	lsl r2, #9
+	bic r1, r1, r2
+	str r1, [r0]
 	
+    @delay
+    ldr r0, =0xffffff
+istimeup:
+    sub r0, r0, #0x1
+    cmp r0, #0x0
+    bne istimeup
+    
+    @dark led
+	ldr r0, =0x0209c000
+	ldr r1, [r0]
+	ldr r2, =0x1
+	lsl r2, #9
+	orr r1, r1, r2
+	str r1, [r0]
+	
+	mov pc,lr
