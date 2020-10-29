@@ -1,6 +1,25 @@
 .global uart_init
 @init the uart register
 uart_init:
+
+	@disable uart
+    ldr r0, =0x2020080
+    ldr r1, =0x0
+    str r1, [r0]
+	
+	@reset uart
+	ldr r0, =0x2020084
+	ldr r2, =0x1
+	ldr r1, [r0]
+	bic r1, r2
+	str r1, [r0]
+isreset:
+	ldr r0, =0x20200b4
+	ldr r1, [r0]
+	and r1, r2
+	cmp r1, #0x1
+	beq isreset
+	
     @set pad gpio1_16-17 ALT0
     ldr r0, =0x20e0084
     ldr r1, [r0]
@@ -24,11 +43,11 @@ uart_init:
     ldr r1, =0x4027
     str r1, [r0]
     
-    @set ucr3
+    @set ucr3 0x4
     ldr r0, =0x2020088
     ldr r1, =0x4
     str r1, [r0]
-    
+	
     @set ufcr for dte/dce
     ldr r0, =0x2020090
     ldr r1, =0x80
@@ -56,7 +75,9 @@ uart_init:
     ldr r2, =0x03000000
     orr r1, r2
     str r1, [r0]
-    
+	
+
+	
     @enable uart
     ldr r0, =0x2020080
     ldr r1, =0x1
@@ -64,7 +85,14 @@ uart_init:
     
     mov pc, lr
     
-putc:
+
+.global uart_pri_r0
+
+uart_pri_r0:
+    ldr r1, =0x8 		@setup repeat count 8 in r1
+	ldr r2, [r0]
+putbyte:	
+	and r7, r2, #0xf0000000		@get lower 4bit of r2
 	lsr r4, r7, #28
 isbusy:	
     ldr r5, =0x2020098
@@ -78,22 +106,43 @@ isbusy:
 	addhi r4, #0x57
 	ldr r5, =0x2020040
     str r4, [r5]
-    mov pc, lr
-    
-@getc:
-@    mov pc, lr
-
-.global uart_pri_r0
-
-uart_pri_r0:
-    ldr r1, =0x8 		@setup repeat count 8 in r1
-	ldr r2, [r0]
-putbyte:	
-	and r7, r2, #0xf0000000	@get lower 4bit of r2
-	bl putc				@put one byte
+	
 	lsl r2, #4			@right shift r2 4 bits 
 	cmp r1, #0x1		@compare repeat count with 0x0
 	subne r1, #1		@repeat count -1
 	bne putbyte
-    mov pc,lr
+	
+    mov pc, lr
+
+
+	
+	
+.global uart_newline
+
+uart_newline:
+isbusy1:	
+    ldr r5, =0x2020098
+    ldr r6, [r5]
+    lsr r6, #3
+    and r6, #0x1
+    cmp r6, #0x1
+    bne isbusy1
+	
+	ldr r7, =0xd	@'\r'
+	ldr r5, =0x2020040
+    str r7, [r5]
+	
+isbusy2:	
+    ldr r5, =0x2020098
+    ldr r6, [r5]
+    lsr r6, #3
+    and r6, #0x1
+    cmp r6, #0x1
+    bne isbusy2
+	
+	ldr r7, =0xa	@'\n'
+	ldr r5, =0x2020040
+    str r7, [r5]	
+	
+    mov pc, lr
 	

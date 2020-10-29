@@ -18,5 +18,9 @@ $(target).imx:$(obj)
 %.o:%.s
 	$(CC) -c $< -o $@
 	
+burn:
+	dd if=/dev/zero of=/dev/sdb bs=1k seek=4 count=10
+	dd if=$(target).imx of=/dev/sdb bs=1k seek=4 conv=fsync
+
 clean:
 	@rm $(obj) $(target).elf $(target).imx -rf

@@ -1,6 +1,6 @@
 SECTIONS
 {
-	. = 0x90010000;
+	. = 0x87800000;
 	.text : {
 		src/test.o
 		*(.text)
