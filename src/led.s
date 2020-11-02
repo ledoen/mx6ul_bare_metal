@@ -71,3 +71,4 @@ istimeup:
 	str r1, [r0]
 	
 	mov pc,lr
+	
