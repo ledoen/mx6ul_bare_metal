@@ -157,7 +157,7 @@ wait_lcd_dereset:
 
     @set vdctrl0
     ldr r0, =0x21c8000
-    ldr r1, =0x133000a
+    ldr r1, =0x1330000a
     str r1, [r0, #0x70]
 
     @set vdctrl1
@@ -169,8 +169,7 @@ wait_lcd_dereset:
     str r1, [r0, #0x90]
 
     @set vdctrl3
-@    ldr r1, =0x2e0017
-    ldr r1, =0x1a000d
+    ldr r1, =0x2e0017
     str r1, [r0, #0xa0]
 
     @set vdctrl4
