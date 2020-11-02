@@ -209,11 +209,6 @@ delay_fifo:
 	cmp r0, #0x1
 	bne delay_fifo
 	
-	@disable dotclk
-    ldr r0, =0x21c8000
-    ldr r1, =0x80f21
-    str r1, [r0]	
-
     mov pc, lr
 
 .global write_rgb_data
