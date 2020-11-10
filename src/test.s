@@ -16,7 +16,7 @@ test:
 	bl uart_pri_r0
 	bl uart_newline	
 	
-	ldr r0, =0x0000ffff
+	ldr r0, =0x00ff0000
 	bl write_rgb_data
 	
 	bl lcd_init

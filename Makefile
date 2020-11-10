@@ -1,4 +1,4 @@
-target = test
+target = main
 srcdir = src
 #CC = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-gcc
 #LD = /opt/cross_toolchain-4.9.2/bin/arm-none-eabi-ld
