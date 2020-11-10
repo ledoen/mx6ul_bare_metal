@@ -5,8 +5,9 @@
 *3. key_handler
 */
 .global key_init
-key_init:
 /*设置GPIO1_2管脚模式，中断模式*/
+
+key_init:
 	ldr r0, =0x020e0064		@将IOMUX寄存器地址放入r0
 	ldr r1, [r0]		@将寄存器值读出放入r1
 	bic r1, r1, #0xf		@将r1的低4位清零
@@ -33,13 +34,13 @@ key_init:
 	@设置GPIO_ICR寄存器
 	ldr r0, =0x0209c00c
 	ldr r1, [r0]
-	orr r1, r1, #(0x3 << 4)
+	orr r1, r1, #(0x3<<4)
 	str r1, [r0]
 	
 	@设置GPIO_IMR寄存器，允许GPIO1_IO02中断
-	ldr r0, =0x0209c14
+	ldr r0, =0x0209c014
 	ldr r1, [r0]
-	orr r1, r1, #(0x1 << 2)
+	orr r1, r1, #(0x1<<2)
 	str r1, [r0]
 	
 	mov pc, lr
