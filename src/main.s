@@ -51,29 +51,39 @@ shutdown_int:
 	bl led_init
 	bl key_init
 	
+	
 	bl uart_newline
-	ldr r0, =0x209c00c
+
+	ldr r0, =0x0
+	mrc p15, 0, r0, c12, c0, 0
+	mov r6, r0
+	ldr r0, =0x90010000
+	str r6, [r0]
+	
 	bl uart_pri_r0
 	bl uart_newline
-	ldr r0, =0x209c014
-	bl uart_pri_r0
-	bl uart_newline
-	ldr r0, =0x209c018
-	bl uart_pri_r0
-	bl uart_newline
-	ldr r0, =0x209c01c
-	bl uart_pri_r0
-	bl uart_newline
+
 	
 	bl led_up
 
 
 main_loop:
-@	ldr r0, =0x0209c000	@持续点亮led灯，在中断函数中关闭led灯
-@	ldr r1, [r0]
-@	ldr r2, =0x1
-@	lsl r2, #9
-@	bic r1, r1, r2
-@	str r1, [r0]
+	ldr r0, =0x0209c000		/*关闭led*/
+	ldr r1, [r0]
+	ldr r2, =0x1
+	lsl r2, #9
+	orr r1, r1, r2
+	str r1, [r0]
+
+	ldr r0, =0x209c018
+	ldr r1, [r0]
+	and r1, r1, #0x4
+	lsr r1, #2
+	cmp r1, #0x1	@判断中断标志位是否为1
+	bne main_loop
+	bl uart_newline
+	ldr r0, =0x209c018
+	bl uart_pri_r0
+	bl uart_newline
 	b main_loop
 	
