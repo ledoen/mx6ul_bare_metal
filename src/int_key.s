@@ -33,8 +33,7 @@ key_init:
 	
 	@设置GPIO_ICR寄存器
 	ldr r0, =0x0209c00c
-	ldr r1, [r0]
-	orr r1, r1, #(0x3<<4)
+	ldr r1, =0x30
 	str r1, [r0]
 	
 	@设置GPIO_IMR寄存器，允许GPIO1_IO02中断
@@ -43,18 +42,38 @@ key_init:
 	orr r1, r1, #(0x1<<2)
 	str r1, [r0]
 	
+	@设置GPIO_IMR寄存器，清除GPIO1_IO02中断标志
+	ldr r0, =0x0209c018
+	ldr r1, [r0]
+	orr r1, r1, #(0x1<<2)
+	str r1, [r0]
+	
 	mov pc, lr
 
 .global system_irq_handler
 system_irq_handler:
+	ldr r0, =0x0209c000		/*打开led*/
+	ldr r1, [r0]
+	ldr r2, =0x1
+	lsl r2, #9
+	bic r1, r1, r2
+	str r1, [r0]
+
+
 	ldr r1, =0x62			/*GPIO1_0-15对应的中断编号为98*/
 	cmp r0, r1
 	movne pc, lr			/*如果不等，不处理返回
 							*相等，则执行key_handler*/
 	
 key_handler:
-	ldr r1, =0xffff
+	ldr r0, =0x0209c000		/*打开led*/
+	ldr r1, [r0]
+	ldr r2, =0x1
+	lsl r2, #9
+	bic r1, r1, r2
+	str r1, [r0]
 	/*延时*/
+	ldr r1, =0xffffff
 anti_fake_delay:
 	nop
 	nop
@@ -62,13 +81,11 @@ anti_fake_delay:
 	cmp r1, #0x1
 	bne anti_fake_delay
 	
-	/*判断GPIO1_2数据寄存器是否为0,如果为0，将r6置为1*/
-    ldr r0, =0x209C000
-    ldr r1, [r0]
-    @取出第二位,判断是否为1
-    lsr r1, #2
-    and r1, r1, #0x1
-    cmp r1, #0x1
+	@清零中断标志位
+	ldr r0, =0x0209c018
+	ldr r1, [r0]
+	orr r1, r1, #(0x1<<2)
+	str r1, [r0]	
 	
-	ldrne r6, =0x1
 	mov pc, lr
+	
